@@ -28,6 +28,7 @@ function checkCancelSignature(oid,signature, address){
 }
 
 
+
 // Create an order in database
 // POST /api/v1/order
 exports.create = async(req, res) => {
@@ -184,7 +185,6 @@ exports.findOpenOrders = (req, res) => {
 			res.status(500).send({ message: err.message || "Some error occurred while retrieiving PENDING orders." });
 		});
 };
-
 
 
 // Return the order book for a given symbol
