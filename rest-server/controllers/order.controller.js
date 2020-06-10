@@ -186,6 +186,24 @@ exports.findOpenOrders = (req, res) => {
 		});
 };
 
+// get a users open orders 
+exports.myOrders = (req, res) => {
+	// get order id from url 
+	const address = req.params.address;
+	console.log('findMyOrders: ', address);
+
+	Order.findAll({
+		attributes: ['symbol', 'quantity', 'price', 'makerSide', 'orderType', 'orderId', 'status', 'address', 'signedOffer'],
+		where: { status: "OPEN", address : address }
+	})
+		.then(data => {
+			// TODO we need to manipulate the data here before sending back
+			res.send(data);
+		})
+		.catch(err => {
+			res.status(500).send({ message: err.message || "Some error occurred while retrieiving PENDING orders." });
+		});
+};
 
 // Return the order book for a given symbol
 exports.getOrderBook = (req, res) => {

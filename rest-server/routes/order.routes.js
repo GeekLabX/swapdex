@@ -24,6 +24,9 @@ module.exports = app => {
   // Delete a Order with id
   router.delete("/delete/:orderId", order.delete);
 
+  // Get a users open orders 
+  router.get("/myOrders/:address", order.myOrders);
+
 
   app.use('/api/v1', router);
 };

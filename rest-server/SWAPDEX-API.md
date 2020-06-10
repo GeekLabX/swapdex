@@ -12,6 +12,7 @@ Currently supported functions:
 
 [Get Order Book](#get-order-book)
 
+[Get My Open Orders](#get-my-open-orders)
 
 ## REST API Endpoints
 
@@ -229,6 +230,46 @@ body = {
         }
     ]
 }
+```
+
+### Get My Open Orders <a name="get-my-open-orders"></a>
+
+`GET /api/v1/myOrders/:address`
+
+
+
+#### Get My Open Orders Request
+`GET /api/v1/myOrders/0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48`
+
+#### Create Order Response
+
+This is the message returned from the above HTTP POST request
+
+```
+[
+    {
+        "symbol": "ETH/USDT",
+        "quantity": "200.00000000",
+        "price": "300.00000000",
+        "makerSide": "BUY",
+        "orderType": "LIMIT",
+        "orderId": 1,
+        "status": "OPEN",
+        "address": "0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48",
+        "signedOffer": "{\"offer\":{\"offer_token\":1,\"offer_amount\":100,\"requested_token\":0,\"requested_amount\":200,\"nonce\":1},\"signer\":\"0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48\",\"signature\":\"0x0162a802f327a003d5f8cd175009b3e0f24edc5120eba064b08513daa4ccdd470e607e8a5fe1bd84a3751f4514b50cc802dd2c85944e6d99a36d266af304a5428b\"}"
+    },
+    {
+        "symbol": "OAX/ETH",
+        "quantity": "200.00000000",
+        "price": "300.00000000",
+        "makerSide": "BUY",
+        "orderType": "LIMIT",
+        "orderId": 2,
+        "status": "OPEN",
+        "address": "0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48",
+        "signedOffer": "{\"offer\":{\"offer_token\":1,\"offer_amount\":100,\"requested_token\":0,\"requested_amount\":200,\"nonce\":1},\"signer\":\"0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48\",\"signature\":\"0x0162a802f327a003d5f8cd175009b3e0f24edc5120eba064b08513daa4ccdd470e607e8a5fe1bd84a3751f4514b50cc802dd2c85944e6d99a36d266af304a5428b\"}"
+    }
+]
 ```
 
 # UNUSED! 
