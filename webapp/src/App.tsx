@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Switch, Route, Link } from 'react-router-dom';
-import { Typography, Layout, Row, Col, Menu } from 'antd';
+import { Typography, Layout, Row, Col, Menu, Divider } from 'antd';
 import { FormOutlined, OrderedListOutlined } from '@ant-design/icons';
 import {
 	web3Accounts,
@@ -15,7 +15,7 @@ import 'antd/dist/antd.css';
 import OrdersPage from './OrdersPage';
 import CreateSwap from './components/CreateSwap';
 
-const { Footer } = Layout;
+const { Header, Content } = Layout;
 const { Title } = Typography;
 
 const App = () => {
@@ -32,41 +32,43 @@ const App = () => {
 
 	return (
 		<BrowserRouter>
-			<Row>
-				<Col span={8} />
-				<Col span={8}>
-					<Link to='/'>
-						<Title level={2}>SWAP DEX - OAX Parachain</Title>
-					</Link>
-				</Col>
-				<Col span={8} />
-			</Row>
-			<Row>
-				<Col span={8} />
-				<Col span={8}>
-					<Menu mode='horizontal'>
-						<Menu.Item key='create' icon={<FormOutlined />}>
-							<Link to='/createSwap'>Create Swap</Link>
-						</Menu.Item>
-						<Menu.Item key='view' icon={<OrderedListOutlined />}>
-							<Link to='/viewSwaps'>View Swaps</Link>
-						</Menu.Item>
-					</Menu>
-				</Col>
-				<Col span={8} />
-			</Row>
-			<Switch>
-				<Route path='/viewSwaps'>
-					<OrdersPage selectedMarket='OAX/ETH' />
-				</Route>
-				<Route path='/createSwap'>
-					<CreateSwap />
-				</Route>
-				<Route path='/'>
-					<OrdersPage selectedMarket='OAX/ETH' />
-				</Route>
-			</Switch>
-			<Footer></Footer>
+			<Layout>
+				<Header style={{ backgroundColor: '#1A467E' }}>
+					<Row justify='end' align='middle'>
+						<Col span={16}>
+							<Link to='/'>
+								<Title level={2} style={{ color: '#FFFFFF' }}>
+									SWAP DEX - OAX Parachain
+								</Title>
+							</Link>
+						</Col>
+						<Col span={8}>
+							<Menu mode='horizontal' theme='dark'>
+								<Menu.Item key='create' icon={<FormOutlined />}>
+									<Link to='/createSwap'>Create Swap</Link>
+								</Menu.Item>
+								<Menu.Item key='view' icon={<OrderedListOutlined />}>
+									<Link to='/viewSwaps'>View Swaps</Link>
+								</Menu.Item>
+							</Menu>
+						</Col>
+					</Row>
+				</Header>
+				<Divider />
+				<Content>
+					<Switch>
+						<Route path='/viewSwaps'>
+							<OrdersPage selectedMarket='OAX/ETH' />
+						</Route>
+						<Route path='/createSwap'>
+							<CreateSwap />
+						</Route>
+						<Route path='/'>
+							<OrdersPage selectedMarket='OAX/ETH' />
+						</Route>
+					</Switch>
+				</Content>
+			</Layout>
 		</BrowserRouter>
 	);
 };
