@@ -1,5 +1,5 @@
 
-module.exports = {
+const util = {
 	// symbol is a string like "OAX/BTC"
 	// returns Arraay containing 2 strings ["OAX", BTC"]
 	// if parsing failed, returns empty Array
@@ -9,5 +9,6 @@ module.exports = {
 			return result;
 		else return [];
 	}
-
 }
+
+export default util;

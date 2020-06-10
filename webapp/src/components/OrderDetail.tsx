@@ -3,13 +3,13 @@ import { Button, Form, Divider } from 'antd';
 import { ValidateErrorEntity } from 'rc-field-form/lib/interface';
 import { AppContext } from '../AppContext';
 import { SizeType } from 'antd/lib/config-provider/SizeContext';
-import { parseSymbol } from '../util';
+import util from '../util';
 
 const OrderDetail = () => {
 	const componentSize: SizeType = 'small';
 	//const { dispatch } = useContext(AppContext);
 	const { state } = useContext(AppContext);
-	let [ccy1, ccy2] = parseSymbol(state.symbol);
+	let [ccy1, ccy2] = util.parseSymbol(state.symbol);
 
 	const [price, setPrice] = useState(0.0);
 	const [amount, setAmount] = useState(0.0);

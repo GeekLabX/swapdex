@@ -12,7 +12,7 @@ import {
 } from 'antd';
 import { RadioChangeEvent } from 'antd/lib/radio';
 import fetch from 'node-fetch';
-import { parseSymbol } from '../util';
+import util from '../util';
 import CreateSwapReview from './CreateSwapReview';
 import { REST_URL } from '../constants';
 import { withRouter, RouteComponentProps } from 'react-router';
@@ -61,7 +61,7 @@ const CreateSwap: React.FC<CreateSwapProps> = ({ history }) => {
 
 	const onChangeMarket = (s: RadioChangeEvent) => {
 		console.log('changed market to: ', s.target.value);
-		let [ccy1, ccy2] = parseSymbol(s.target.value);
+		let [ccy1, ccy2] = util.parseSymbol(s.target.value);
 		setValues({ ...values, market: s.target.value, ccy1: ccy1, ccy2: ccy2 });
 	};
 

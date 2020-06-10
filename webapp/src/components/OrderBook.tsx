@@ -8,7 +8,7 @@ import {
 	IOrderBook,
 	ITableData,
 } from '../AppContext';
-import { parseSymbol } from '../util';
+import util from '../util';
 import { REST_URL } from '../constants';
 import '../App.css';
 
@@ -18,7 +18,7 @@ const { Content } = Layout;
 const WCOrderBook = () => {
 	const { state } = useContext(AppContext);
 	const { dispatch } = useContext(AppContext);
-	let [ccy1, ccy2] = parseSymbol(state.symbol);
+	let [ccy1, ccy2] = util.parseSymbol(state.symbol);
 	let loading = false; //TODO not used, we might want to disable things while being refreshed
 	const [refreshTime, setRefreshTime] = useState('');
 	const requestOptions = {
