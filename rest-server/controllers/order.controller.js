@@ -2,6 +2,7 @@
 const db = require("../models");
 const Order = db.order;
 const Op = db.Sequelize.Op;
+const util = require('../util');
 
 // Create an order in database
 // POST /api/v1/order
@@ -119,8 +120,6 @@ exports.findOpenOrders = (req, res) => {
 			res.status(500).send({ message: err.message || "Some error occurred while retrieiving PENDING orders." });
 		});
 };
-
-const util = require('../util');
 
 // Return the order book for a given symbol
 exports.getOrderBook = (req, res) => {
