@@ -98,11 +98,10 @@ async function swapDemo() {
   prettyPrintSignedOffer(signedOffer);
 
 
-  // cancelSig = cancelOrder(2, BOB);
-  // console.log(cancelSig);
-  // console.log(Util.u8aToHex(cancelSig));
-  // isValid = checkCancelSignature(5, cancelSig, BOB.address);
-  // console.log(isValid);
+  cancelSig = cancelOrder(1, BOB);
+  console.log(Util.u8aToHex(cancelSig));
+  isValid = checkCancelSignature(5, cancelSig, BOB.address);
+  console.log(isValid);
 
   // Now Bob sends this offer ofline to Alice
   // Alice decides to broadcast it since she is willing to take the offer

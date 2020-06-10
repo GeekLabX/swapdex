@@ -15,17 +15,15 @@ module.exports = app => {
   // Retrieve all open orders
   router.get("/openOrder", order.findOpenOrders);
 
-  // Update a Order with id
-  router.put("/order/:orderId", order.update);
+  // // Update a Order with id
+  // router.put("/order/:orderId", order.update);
 
   // Order book
   router.get("/depth/:symbol", order.getOrderBook);
 
-  // // Delete a Order with id
-  // router.delete("/:id", order.delete);
+  // Delete a Order with id
+  router.delete("/delete/:orderId", order.delete);
 
-  // // Create a new Order
-  // router.delete("/", order.deleteAll);
 
   app.use('/api/v1', router);
 };
