@@ -16,7 +16,12 @@ import '../App.css';
 const { Text } = Typography;
 const { Content } = Layout;
 
-const WCOrderBook = () => {
+interface Props {
+	// set to false to only see my orders
+	allOrders: boolean;
+}
+
+const OrderBook: React.FC<Props> = ({ allOrders }) => {
 	const { state } = useContext(AppContext);
 	const { dispatch } = useContext(AppContext);
 	let [ccy1, ccy2] = util.parseSymbol(state.symbol);
@@ -184,4 +189,4 @@ const WCOrderBook = () => {
 	);
 };
 
-export default WCOrderBook;
+export default OrderBook;

@@ -7,8 +7,7 @@ import util from '../util';
 
 const OrderDetail = () => {
 	const componentSize: SizeType = 'small';
-	//const { dispatch } = useContext(AppContext);
-	const { state } = useContext(AppContext);
+	const { state, dispatch } = useContext(AppContext);
 	let [ccy1, ccy2] = util.parseSymbol(state.symbol);
 
 	const [orderId, setOrderId] = useState(0);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
 	Form,
 	Button,
@@ -12,6 +12,7 @@ import {
 } from 'antd';
 import { RadioChangeEvent } from 'antd/lib/radio';
 import fetch from 'node-fetch';
+import { AppContext, Types } from '../AppContext';
 import util from '../util';
 import CreateSwapReview from './CreateSwapReview';
 import { REST_URL } from '../constants';
@@ -22,13 +23,14 @@ const { Text } = Typography;
 type CreateSwapProps = RouteComponentProps;
 
 const CreateSwap: React.FC<CreateSwapProps> = ({ history }) => {
-	//TODO instead of setting default market here we should pass in as a prop
-	// so if user clicked create swap from OAX/BTC page, we set that as market
+	const { state, dispatch } = useContext(AppContext);
+	let [ccy1, ccy2] = util.parseSymbol(state.symbol);
+
 	const [values, setValues] = useState({
-		market: 'OAX/ETH',
-		ccy1: 'OAX',
+		market: state.symbol,
+		ccy1: ccy1,
 		ccy1Quantity: 0,
-		ccy2: 'ETH',
+		ccy2: ccy2,
 		ccy2Quantity: 0,
 		price: 0,
 		side: 'BUY',
@@ -63,6 +65,12 @@ const CreateSwap: React.FC<CreateSwapProps> = ({ history }) => {
 		console.log('changed market to: ', s.target.value);
 		let [ccy1, ccy2] = util.parseSymbol(s.target.value);
 		setValues({ ...values, market: s.target.value, ccy1: ccy1, ccy2: ccy2 });
+		dispatch({
+			type: Types.SYMBOL_CHANGE,
+			payload: {
+				symbol: s.target.value,
+			},
+		});
 	};
 
 	const onFinish = async () => {
@@ -89,9 +97,10 @@ const CreateSwap: React.FC<CreateSwapProps> = ({ history }) => {
 		let data = await fetch(url, requestOptions);
 		let json = await data.json();
 		if (data.ok) {
+			console.log('calling viewSwaps with mkt: ', values.market);
 			history.push({
 				pathname: `/viewSwaps?mkt={values.market}`,
-				state: { selectedMarket: values.market },
+				state: { selectedMarket: values.market, wayland: 'chan' },
 			});
 		}
 		//const [values, setValues] = useState(AppContext);
