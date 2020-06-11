@@ -11,6 +11,7 @@ const OrderDetail = () => {
 	const { state } = useContext(AppContext);
 	let [ccy1, ccy2] = util.parseSymbol(state.symbol);
 
+	const [orderId, setOrderId] = useState(0);
 	const [price, setPrice] = useState(0.0);
 	const [amount, setAmount] = useState(0.0);
 	const [total, setTotal] = useState(0.0);
@@ -32,6 +33,7 @@ const OrderDetail = () => {
 				if (data.ok) {
 					let orderDetails = await data.json();
 					console.log('OrderDetail json: ', orderDetails);
+					setOrderId(orderDetails.orderId);
 					setPrice(orderDetails.price);
 					setAmount(orderDetails.quantity);
 					setSide(orderDetails.makerSide);
@@ -46,10 +48,13 @@ const OrderDetail = () => {
 	});
 
 	const onFinish = () => {
-		console.log('Success: ');
-		console.log(price);
-		console.log(amount);
-		console.log(total);
+		if (orderId !== 0) {
+			console.log(price);
+			console.log(amount);
+			console.log(total);
+		} else {
+			console.log('user clicked buy/sell without order selected');
+		}
 	};
 
 	const onFinishFailed = (errorInfo: ValidateErrorEntity) => {
@@ -82,7 +87,7 @@ const OrderDetail = () => {
 				<Form.Item label={totalLabel}>{total}</Form.Item>
 				<Divider />
 				<Form.Item>
-					<Button type='ghost' htmlType='submit'>
+					<Button size='large' type='ghost' htmlType='submit'>
 						{tradeButton}
 					</Button>
 				</Form.Item>
