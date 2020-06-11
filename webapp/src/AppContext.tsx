@@ -66,8 +66,8 @@ const initialState: IStateContext = {
 		asks: [{ makerSig: '', orderId: 0, price: '0', quantity: '0' }],
 		bids: [{ makerSig: '', orderId: 0, price: '0', quantity: '0' }],
 	},
-	bids: [{ key: 1, price: '1', amount: '1', total: 1 }],
-	asks: [{ key: 2, price: '1', amount: '1', total: 1 }],
+	bids: [],
+	asks: [],
 };
 
 const AppContext = createContext<{
