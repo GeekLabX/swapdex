@@ -36,7 +36,7 @@ export interface ITableData {
 	key: number;
 	price: string;
 	amount: string;
-	total: number;
+	total: string;
 }
 
 export interface ICreateOrder {
