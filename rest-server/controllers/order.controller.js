@@ -136,24 +136,29 @@ exports.getOrderBook = (req, res) => {
 		order: [["price", "DESC"]]
 	})
 		.then(data => {
+			//console.log('bids: ', data.toJSON());
 			finalJSON.bids = data;
 		})
+		.then(() => {
+			Order.findAll({
+				attributes: ['orderId', 'price', 'quantity', 'makerSig'],
+				where: { symbol: symbol, makerSide: "SELL" },
+				order: [["price", "ASC"]]
+			})
+				.then(data => {
+					finalJSON.asks = data;
+				})
+				.then(() => {
+					res.send(finalJSON);
+				});
+			// .catch(err => {
+			// 	res.status(500).send({ message: err.message || `Some error retrieving order book for ${symbol}` });
+			// });
+
+		})
 		.catch(err => {
+			console.log('Some error retrieving order book for ${symbol}: ', err.message);
 			res.status(500).send({ message: err.message || `Some error retrieving order book for ${symbol}` });
 		});
 
-	Order.findAll({
-		attributes: ['orderId', 'price', 'quantity', 'makerSig'],
-		where: { symbol: symbol, makerSide: "SELL" },
-		order: [["price", "ASC"]]
-	})
-		.then(data => {
-			finalJSON.asks = data;
-		})
-		.then(() => {
-			res.send(finalJSON);
-		})
-		.catch(err => {
-			res.status(500).send({ message: err.message || `Some error retrieving order book for ${symbol}` });
-		});
 }
