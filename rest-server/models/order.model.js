@@ -17,7 +17,7 @@
  status			PENDING|FILLED|CANCELED
  createTime		order creation timestamp in UNIX time
  transactTime	FILLED or CANCELED timestamp in UNIX time
- makerSig		signed message from order maker
+ signedOffer		signed message from order maker
  takerSig		signed message from taker, retrieved when blockchain emits fill event
  */
 
@@ -38,12 +38,16 @@ module.exports = (sequelize, Sequelize) => {
 			type: Sequelize.STRING,
 			allowNull: false,
 		},
-		takerSide: {
+		address: {
 			type: Sequelize.STRING,
-			allowNull: true,
+			allowNull: false,
 		},
+		// takerSide: {
+		// 	type: Sequelize.STRING,
+		// 	allowNull: true,
+		// },
 		quantity: {
-			type: Sequelize.DECIMAL(36, 18),
+			type: Sequelize.DECIMAL(36, 8),
 			allowNull: false,
 		},
 		orderType: {
@@ -51,10 +55,9 @@ module.exports = (sequelize, Sequelize) => {
 			allowNull: false,
 		},
 		price: {
-			type: Sequelize.DECIMAL(36, 18),
+			type: Sequelize.DECIMAL(36, 8),
 			allowNull: false,
 		},
-		// TODO site has not authenticaation so we probably don't need these IDs
 		// makerClientId: {
 		// 	type: Sequelize.STRING,
 		// 	allowNull: false,
@@ -74,14 +77,14 @@ module.exports = (sequelize, Sequelize) => {
 		transactTime: {
 			type: Sequelize.INTEGER
 		},
-		makerSig: {
+		signedOffer: {
 			type: Sequelize.JSON,
 			allowNull: false,
 		},
-		takerSig: {
-			type: Sequelize.JSON,
-			allowNull: true
-		}
+		// takerSig: {
+		// 	type: Sequelize.JSON,
+		// 	allowNull: true
+		// }
 	});
 
 	return Order;
