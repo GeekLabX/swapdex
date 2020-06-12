@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useState } from 'react';
-import { Table, Typography, Layout } from 'antd';
+import { Table, Typography, Layout, Spin } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import fetch from 'node-fetch';
 import {
@@ -22,10 +22,9 @@ interface Props {
 }
 
 const OrderBook: React.FC<Props> = ({ allOrders }) => {
-	const { state } = useContext(AppContext);
-	const { dispatch } = useContext(AppContext);
+	const { state, dispatch } = useContext(AppContext);
 	let [ccy1, ccy2] = util.parseSymbol(state.symbol);
-	let loading = false; //TODO not used, we might want to disable things while being refreshed
+	const [loading, setLoading] = useState(false); //TODO not used, we might want to disable things while being refreshed
 	const [refreshTime, setRefreshTime] = useState('');
 	const requestOptions = {
 		method: 'GET',
@@ -35,9 +34,15 @@ const OrderBook: React.FC<Props> = ({ allOrders }) => {
 	};
 
 	useEffect(() => {
+		//setInterval at end of this useEffect fn waits 5s before fetching
+		//by calling fetchData here, we can display fresh data immediately on each render
+		//leaving the setInterval to do the regular refresh
+		fetchData();
 		// In order to call async functions within useEffect, we need to define
 		// them within the scope of useEffect like this
 		async function fetchData() {
+			setLoading(true);
+			let t0 = performance.now();
 			let url =
 				REST_URL + '/depth/' + encodeURIComponent(state.symbol.toString());
 			let data = await fetch(url, requestOptions);
@@ -60,6 +65,9 @@ const OrderBook: React.FC<Props> = ({ allOrders }) => {
 				});
 			} else console.log('ERROR fetchData had no bids');
 			setRefreshTime(new Date(Date.now()).toLocaleString());
+			let t1 = performance.now();
+			console.log('fetchData took ' + (t1 - t0) + ' ms');
+			setLoading(false);
 		}
 
 		// setInterval runs every 5s, to stop it use clearInterval
@@ -162,28 +170,28 @@ const OrderBook: React.FC<Props> = ({ allOrders }) => {
 				<Text mark>Last Update Time: {refreshTime}</Text>
 			</div>
 			<Content style={{ minHeight: '70vh' }}>
-				<Table
-					columns={topColumns}
-					dataSource={state.bids}
-					pagination={{ hideOnSinglePage: true }}
-					loading={loading}
-					size='small'
-					onRow={(r) => ({
-						onClick: () => onRowClick(r),
-					})}
-					id='oax-orderbook-bids'
-				/>
-				<Table
-					columns={bottomColumns}
-					dataSource={state.asks}
-					pagination={{ hideOnSinglePage: true }}
-					loading={loading}
-					size='small'
-					onRow={(r) => ({
-						onClick: () => onRowClick(r),
-					})}
-					id='oax-orderbook-asks'
-				/>
+				<Spin spinning={loading}>
+					<Table
+						columns={topColumns}
+						dataSource={state.bids}
+						pagination={{ hideOnSinglePage: true }}
+						size='small'
+						onRow={(r) => ({
+							onClick: () => onRowClick(r),
+						})}
+						id='oax-orderbook-bids'
+					/>
+					<Table
+						columns={bottomColumns}
+						dataSource={state.asks}
+						pagination={{ hideOnSinglePage: true }}
+						size='small'
+						onRow={(r) => ({
+							onClick: () => onRowClick(r),
+						})}
+						id='oax-orderbook-asks'
+					/>
+				</Spin>
 			</Content>
 		</div>
 	);

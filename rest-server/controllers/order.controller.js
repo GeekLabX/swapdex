@@ -210,7 +210,6 @@ exports.getOrderBook = (req, res) => {
 	const symbol = req.params.symbol;
 	console.log('getOrderBook: ', symbol);
 	const pairs = util.parseSymbol(symbol);
-	//res.send(`{ firstPair: ${pairs[0]}, secondPair: ${pairs[1]} }`);
 	// we need to build our JSON object manually
 	var finalJSON = { "symbol": symbol };
 	Order.findAll({
@@ -221,24 +220,24 @@ exports.getOrderBook = (req, res) => {
 		.then(data => {
 			finalJSON.bids = data;
 		})
+		.then(() => {
+			Order.findAll({
+				attributes: ['orderId', 'price', 'quantity', 'makerSig'],
+				where: { symbol: symbol, makerSide: "SELL" },
+				order: [["price", "ASC"]]
+			})
+				.then(data => {
+					finalJSON.asks = data;
+				})
+				.then(() => {
+					res.send(finalJSON);
+				});
+		})
 		.catch(err => {
+			console.log('Some error retrieving order book for ${symbol}: ', err.message);
 			res.status(500).send({ message: err.message || `Some error retrieving order book for ${symbol}` });
 		});
 
-	Order.findAll({
-		attributes: ['orderId', 'price', 'quantity', 'signedOffer'],
-		where: { symbol: symbol, makerSide: "SELL", status: "OPEN" },
-		order: [["price", "ASC"]]
-	})
-		.then(data => {
-			finalJSON.asks = data;
-		})
-		.then(() => {
-			res.send(finalJSON);
-		})
-		.catch(err => {
-			res.status(500).send({ message: err.message || `Some error retrieving order book for ${symbol}` });
-		});
 }
 
 
