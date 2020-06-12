@@ -126,7 +126,6 @@ exports.getOrderBook = (req, res) => {
 	const symbol = req.params.symbol;
 	console.log('getOrderBook: ', symbol);
 	const pairs = util.parseSymbol(symbol);
-	//res.send(`{ firstPair: ${pairs[0]}, secondPair: ${pairs[1]} }`);
 
 	// we need to build our JSON object manually
 	var finalJSON = { "symbol": symbol };
@@ -136,7 +135,6 @@ exports.getOrderBook = (req, res) => {
 		order: [["price", "DESC"]]
 	})
 		.then(data => {
-			//console.log('bids: ', data.toJSON());
 			finalJSON.bids = data;
 		})
 		.then(() => {
@@ -151,10 +149,6 @@ exports.getOrderBook = (req, res) => {
 				.then(() => {
 					res.send(finalJSON);
 				});
-			// .catch(err => {
-			// 	res.status(500).send({ message: err.message || `Some error retrieving order book for ${symbol}` });
-			// });
-
 		})
 		.catch(err => {
 			console.log('Some error retrieving order book for ${symbol}: ', err.message);
