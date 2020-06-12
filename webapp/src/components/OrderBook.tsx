@@ -45,12 +45,12 @@ const OrderBook: React.FC<Props> = ({ allOrders }) => {
 			let t0 = performance.now();
 			let url =
 				REST_URL + '/depth/' + encodeURIComponent(state.symbol.toString());
-			let data = await fetch(url, requestOptions);
-			let json = await data.json();
-			console.log('fetchData.rawJson : ', state.symbol.toString(), json);
 
-			//TODO there is a bug where json comes back with bids undefined sometimes
-			if (json.bids) {
+			try {
+				let data = await fetch(url, requestOptions);
+				let json = await data.json();
+				//console.log('fetchData.json : ', state.symbol.toString(), json);
+
 				// extract/transform the raw response into a structure  we can use for UI
 				let askOrders = getAsks(json);
 				let bidOrders = getBids(json);
@@ -58,13 +58,15 @@ const OrderBook: React.FC<Props> = ({ allOrders }) => {
 				dispatch({
 					type: Types.CURRENT_ORDERBOOK,
 					payload: {
-						rawOrderBook: json,
+						symbol: state.symbol.toString(),
 						bids: bidOrders,
 						asks: askOrders,
 					},
 				});
-			} else console.log('ERROR fetchData had no bids');
-			setRefreshTime(new Date(Date.now()).toLocaleString());
+				setRefreshTime(new Date(Date.now()).toLocaleString());
+			} catch (err) {
+				console.log('fetch error: ', err);
+			}
 			let t1 = performance.now();
 			console.log('fetchData took ' + (t1 - t0) + ' ms');
 			setLoading(false);
