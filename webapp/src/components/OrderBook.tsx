@@ -1,5 +1,6 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { Table, Typography, Layout } from 'antd';
+import { ColumnsType } from 'antd/es/table';
 import fetch from 'node-fetch';
 import {
 	AppContext,
@@ -15,7 +16,12 @@ import '../App.css';
 const { Text } = Typography;
 const { Content } = Layout;
 
-const WCOrderBook = () => {
+interface Props {
+	// set to false to only see my orders
+	allOrders: boolean;
+}
+
+const OrderBook: React.FC<Props> = ({ allOrders }) => {
 	const { state } = useContext(AppContext);
 	const { dispatch } = useContext(AppContext);
 	let [ccy1, ccy2] = util.parseSymbol(state.symbol);
@@ -34,7 +40,6 @@ const WCOrderBook = () => {
 		async function fetchData() {
 			let url =
 				REST_URL + '/depth/' + encodeURIComponent(state.symbol.toString());
-			console.log(url);
 			let data = await fetch(url, requestOptions);
 			let json = await data.json();
 			console.log('fetchData.rawJson : ', state.symbol.toString(), json);
@@ -67,12 +72,14 @@ const WCOrderBook = () => {
 		// console.log('getAsks.rawJson: ', rawJson);
 		let rows: ITableData[] = [];
 		rawJson.asks.forEach((ask: IOrderBookEntry) => {
-			let t = parseFloat(ask.price) * parseFloat(ask.quantity);
+			let p = parseFloat(ask.price);
+			let q = parseFloat(ask.quantity);
+			let t = p * q;
 			let a: ITableData = {
 				key: ask.orderId,
-				price: ask.price,
-				amount: ask.quantity,
-				total: t,
+				price: p.toFixed(8),
+				amount: q.toFixed(8),
+				total: t.toFixed(8),
 			};
 			rows.push(a);
 		});
@@ -84,12 +91,14 @@ const WCOrderBook = () => {
 		//console.log('getBids.rawJson: ', rawJson);
 		let rows: ITableData[] = [];
 		rawJson.bids.forEach((bid: IOrderBookEntry) => {
-			let t = parseFloat(bid.price) * parseFloat(bid.quantity);
+			let p = parseFloat(bid.price);
+			let q = parseFloat(bid.quantity);
+			let t = p * q;
 			let a: ITableData = {
 				key: bid.orderId,
-				price: bid.price,
-				amount: bid.quantity,
-				total: t,
+				price: p.toFixed(8),
+				amount: q.toFixed(8),
+				total: t.toFixed(8),
 			};
 			rows.push(a);
 		});
@@ -97,36 +106,42 @@ const WCOrderBook = () => {
 		return rows;
 	};
 
-	const topColumns = [
+	const topColumns: ColumnsType<ITableData> = [
 		{
 			title: `Amount (${ccy1})`,
 			dataIndex: 'amount',
 			key: 'amount',
+			align: 'right',
 		},
 		{
 			title: `Price (${ccy2})`,
 			dataIndex: 'price',
 			key: 'price',
+			align: 'right',
 		},
 		{
 			title: `Total (${ccy2})`,
 			dataIndex: 'total',
 			key: 'total',
+			align: 'right',
 		},
 	];
 
-	const bottomColumns = [
+	const bottomColumns: ColumnsType<ITableData> = [
 		{
 			dataIndex: 'amount',
 			key: 'amount',
+			align: 'right',
 		},
 		{
 			dataIndex: 'price',
 			key: 'price',
+			align: 'right',
 		},
 		{
 			dataIndex: 'total',
 			key: 'total',
+			align: 'right',
 		},
 	];
 
@@ -174,4 +189,4 @@ const WCOrderBook = () => {
 	);
 };
 
-export default WCOrderBook;
+export default OrderBook;

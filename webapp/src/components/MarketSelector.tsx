@@ -1,20 +1,12 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { Form, Radio } from 'antd';
 import 'antd/dist/antd.css';
 import { AppContext, Types } from '../AppContext';
 
-interface Props {
-	selectedMarket: string;
-}
-
-// This component has a selectedMarket property presets the currently
-// selected market
-const MarketSelector: React.FC<Props> = ({ selectedMarket }) => {
-	const { dispatch } = useContext(AppContext);
-	const [market, setMarket] = useState(selectedMarket);
+const MarketSelector: React.FC = () => {
+	const { state, dispatch } = useContext(AppContext);
 	const onChangeMarket = (market: any) => {
 		console.log('user selected ', market.target.value);
-		setMarket(market.target.value);
 		dispatch({
 			type: Types.SYMBOL_CHANGE,
 			payload: {
@@ -29,10 +21,10 @@ const MarketSelector: React.FC<Props> = ({ selectedMarket }) => {
 				label='Select Market'
 				name='market'
 				rules={[{ required: true }]}
-				initialValue={market}
+				initialValue={state.symbol}
 			>
 				<Radio.Group
-					defaultValue={market}
+					defaultValue={state.symbol}
 					buttonStyle='solid'
 					onChange={onChangeMarket}
 				>
