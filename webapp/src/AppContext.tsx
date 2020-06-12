@@ -6,24 +6,18 @@ export enum Types {
 	CURRENT_ORDERBOOK = 'CURRENT_ORDERBOOK',
 }
 
-export type Action =
-	| { type: Types.SYMBOL_CHANGE; payload: { symbol: string } }
-	| {
-			type: Types.CURRENT_ORDERBOOK;
-			payload: {
-				rawOrderBook: IOrderBook;
-				bids: ITableData[];
-				asks: ITableData[];
-			};
-	  }
-	| { type: Types.SELECT_ORDER; payload: { orderId: number } };
-
 // IOrderBook interface is the format of the JSON returned from REST API for /api/v1/depth
 export interface IOrderBook {
 	symbol: string;
 	asks: [IOrderBookEntry];
 	bids: [IOrderBookEntry];
 }
+
+// export const blankOrderBook: IOrderBook = {
+// 	symbol: 'OAX/ETH',
+// 	asks: [{ makerSig: '', orderId: 0, price: '', quantity: '' }],
+// 	bids: [{ makerSig: '', orderId: 0, price: '', quantity: '' }],
+// };
 
 export interface IOrderBookEntry {
 	makerSig: string;
@@ -53,7 +47,6 @@ export interface ICreateOrder {
 type IStateContext = {
 	orderId: number;
 	symbol: String;
-	rawOrderBook: IOrderBook;
 	bids: ITableData[];
 	asks: ITableData[];
 };
@@ -61,13 +54,8 @@ type IStateContext = {
 const initialState: IStateContext = {
 	orderId: 0,
 	symbol: 'OAX/ETH',
-	rawOrderBook: {
-		symbol: 'OAX/ETH',
-		asks: [{ makerSig: '', orderId: 0, price: '0', quantity: '0' }],
-		bids: [{ makerSig: '', orderId: 0, price: '0', quantity: '0' }],
-	},
-	bids: [],
-	asks: [],
+	bids: [{ key: 0, price: '0.0', amount: '0.0', total: '0.0' }],
+	asks: [{ key: 0, price: '0.0', amount: '0.0', total: '0.0' }],
 };
 
 const AppContext = createContext<{
@@ -78,16 +66,35 @@ const AppContext = createContext<{
 	dispatch: () => null,
 });
 
+export type Action =
+	| {
+			type: Types.SYMBOL_CHANGE;
+			payload: {
+				symbol: string;
+				bids: ITableData[];
+				asks: ITableData[];
+			};
+	  }
+	| {
+			type: Types.CURRENT_ORDERBOOK;
+			payload: {
+				symbol: string;
+				bids: ITableData[];
+				asks: ITableData[];
+			};
+	  }
+	| { type: Types.SELECT_ORDER; payload: { orderId: number } };
+
 export const appReducer = (state: IStateContext, action: Action) => {
 	switch (action.type) {
 		case Types.SYMBOL_CHANGE:
+			// Send empty bids/asks here to clear display while fetching new market
 			console.log('DISPATCH:: user changed market to: ', action.payload.symbol);
 			return {
 				...state,
 				symbol: action.payload.symbol,
-				rawOrderBook: {},
-				bids: [],
-				asks: [],
+				bids: [{ key: 0, price: '0.0', amount: '0.0', total: '0.0' }],
+				asks: [{ key: 0, price: '0.0', amount: '0.0', total: '0.0' }],
 			};
 		case Types.SELECT_ORDER:
 			console.log('DISPATCH:: user selected orderId: ', action.payload.orderId);
@@ -96,9 +103,10 @@ export const appReducer = (state: IStateContext, action: Action) => {
 				orderId: action.payload.orderId,
 			};
 		case Types.CURRENT_ORDERBOOK:
+			console.log('DISPATCH:: received new orderbook: ', action.payload);
 			return {
 				...state,
-				rawOrderBook: action.payload.rawOrderBook,
+				symbol: action.payload.symbol,
 				asks: action.payload.asks,
 				bids: action.payload.bids,
 			};
