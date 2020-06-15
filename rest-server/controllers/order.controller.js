@@ -44,6 +44,9 @@ exports.create = async (req, res) => {
 
     // Initialize parrot (Need this for verification of types + blockchain communication)
     const parrot = await parrotInit();
+    console.log('CreateOrder!');
+    console.log(req.body);
+    console.log(req.body.signedOffer.offer);
 
     // TODO: verify symbol (currently chain only uses TokenId)
     // no mapping between symbol and tokenId exists (Future update)
@@ -51,6 +54,7 @@ exports.create = async (req, res) => {
     try {
         // get the Signed Offer
         const signedOffer = parrot.api.createType('SignedOffer', req.body.signedOffer);
+        // console.log(signedOffer);
         // verify if its correctly signed; 
         const maker = signedOffer.signer;
         const offer = signedOffer.offer;
@@ -59,13 +63,18 @@ exports.create = async (req, res) => {
         const isValid = UtilCrypto.signatureVerify(encoded_offer, signature, maker);
         // if its correctly signed!
         if (isValid.isValid) {
+            console.log("Signature is valid!");
             //verify user nonce 
             const nonce = await parrot.getNonce(maker);
             if (nonce.toNumber() === offer.nonce.toNumber()) {
+                console.log("Nonce is valid!")
                 // get offer token balance
-                const offerer_token_balance = await parrot.getTokenBalance(maker, offer.offer_token);
+                const offerer_token_balance = 1000000; //(HARDCODED)
+                //TODO UNCOMMENT BELOW LINE AND RE_ENABLE VERIFICATION
+                //const offerer_token_balance = await parrot.getTokenBalance(maker, offer.offer_token);
                 // ensure user has enough tokens 
                 if (offerer_token_balance > offer.offer_amount) {
+                    console.log("Balance check passed!")
                     // TODO : verify quantity and price and side
                     console.log('create quantity: ', req.body.quantity);
                     const order = {
@@ -79,6 +88,7 @@ exports.create = async (req, res) => {
                         status: "OPEN",
                         createTime: Date.now() / 1000
                     };
+                    console.log(order);
                     Order.create(order)
                         .then(data => {
                             res.send(data);
@@ -91,14 +101,17 @@ exports.create = async (req, res) => {
 
                 }
                 else {
+                    console.log(`Not Enough Balance! Current Token Balance: ${offerer_token_balance} Order Amount: ${offer.offer_amount}`)
                     res.status(500).send({ message: `Not Enough Balance! Current Token Balance: ${offerer_token_balance} Order Amount: ${offer.offer_amount}` })
                 }
             }
             else {
+                console.log("Invalid Nonce!")
                 res.status(500).send({ message: `Invalid Nonce! Current Nonce: ${nonce} Order Nonce: ${signedOffer.offer.nonce}` })
             }
         }
         else {
+            console.log("Invalid Signature!")
             res.status(500).send({ message: "Invalid Signature!" })
         }
     }
@@ -140,11 +153,11 @@ exports.findOne = (req, res) => {
 // 			if (num == 1) {
 // 				//TODO this should return the order details
 // 				res.send({
-// 					message: `Order ${orderId} updated successfully.`
+// 					message: `Order ${ orderId } updated successfully.`
 // 				});
 // 			} else {
 // 				res.status(500).send({
-// 					message: `Cannot update order ${orderId}. Maybe order not found or req.body was empty!`
+// 					message: `Cannot update order ${ orderId }.Maybe order not found or req.body was empty!`
 // 				});
 // 			}
 // 		})
@@ -225,7 +238,7 @@ exports.getOrderBook = (req, res) => {
         .then(() => {
             Order.findAll({
                 attributes: ['orderId', 'price', 'quantity', 'signedOffer'],
-                where: { symbol: symbol, makerSide: "SELL" },
+                where: { symbol: symbol, makerSide: "SELL", status: "OPEN" },
                 order: [["price", "ASC"]]
             })
                 .then(data => {
@@ -257,6 +270,7 @@ exports.delete = async (req, res) => {
         // check if signature is valid 
         valid = checkCancelSignature(orderId, signature, address);
         if (valid) {
+            console.log("Valid cancel sig!");
 
 
             Order.update({ status: 'CANCELED' }, {
@@ -270,7 +284,7 @@ exports.delete = async (req, res) => {
                         });
                     } else {
                         res.status(500).send({
-                            message: `Cannot cancel order ${orderId}. Maybe order not found or req.body was empty!`
+                            message: `Cannot cancel order ${orderId}.Maybe order not found or req.body was empty!`
                         });
                     }
                 })
