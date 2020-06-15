@@ -18,14 +18,15 @@
 	"author": "bezkoder",
 	"license": "ISC",
 	"dependencies": {
+		"@polkadot/api": "1.14.1",
+		"@polkadot/keyring": "2.10.1",
+		"@polkadot/util": "^2.8.1",
 		"body-parser": "^1.19.0",
 		"cors": "^2.8.5",
 		"express": "^4.17.1",
 		"mysql2": "^2.0.2",
-		"sequelize": "^5.21.2",
-		"@polkadot/api": "1.14.1",
-		"@polkadot/util": "^2.8.1",
-		"@polkadot/keyring": "2.10.1"
+		"parrot-client": "file:../parrot-client",
+		"sequelize": "^5.21.2"
 	},
 	"devDependencies": {
 		"nodemon": "^2.0.4"
