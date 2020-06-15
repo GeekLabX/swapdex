@@ -9,21 +9,21 @@ const UtilPolk = require('@polkadot/util');
 const util = require('../util');
 
 //TODO: super initialize somewhere so you dont need to re-init every time you get a request 
-async function parrotInit(){
-  // Get a new instance of the interface
-  const parrot = new ParrotInterface(ADDITIONAL_TYPES);
-  // Init api
-  await parrot.initApi();
-  // Init keyrings
-  await parrot.initKeyRings();
-  // return interface
-  return parrot; 	
+async function parrotInit() {
+	// Get a new instance of the interface
+	const parrot = new ParrotInterface(ADDITIONAL_TYPES);
+	// Init api
+	await parrot.initApi();
+	// Init keyrings
+	await parrot.initKeyRings();
+	// return interface
+	return parrot;
 }
 
-function checkCancelSignature(oid,signature, address){
-	cancel_message = {"cancel": oid}.toString();
+function checkCancelSignature(oid, signature, address) {
+	cancel_message = { "cancel": oid }.toString();
 	encoded_message = UtilPolk.stringToU8a(cancel_message);
-	const isValid = UtilCrypto.signatureVerify(encoded_message,signature, address);
+	const isValid = UtilCrypto.signatureVerify(encoded_message, signature, address);
 	return isValid.isValid
 }
 
@@ -31,7 +31,7 @@ function checkCancelSignature(oid,signature, address){
 
 // Create an order in database
 // POST /api/v1/order
-exports.create = async(req, res) => {
+exports.create = async (req, res) => {
 	// Validate request
 	if (!req.body) {
 		res.status(400).send({
@@ -39,31 +39,31 @@ exports.create = async(req, res) => {
 		});
 		return;
 	}
-	
+
 	// Initialize parrot (Need this for verification of types + blockchain communication)
-	const parrot = await parrotInit(); 
+	const parrot = await parrotInit();
 
 	// TODO: verify symbol (currently chain only uses TokenId)
 	// no mapping between symbol and tokenId exists (Future update)
 
-	try{
+	try {
 		// get the Signed Offer
-		const signedOffer = parrot.api.createType('SignedOffer', req.body.signedOffer); 
+		const signedOffer = parrot.api.createType('SignedOffer', req.body.signedOffer);
 		// verify if its correctly signed; 
-		const maker = signedOffer.signer; 
-		const offer = signedOffer.offer; 
-		const encoded_offer = offer.toU8a(); 
-		const signature = signedOffer.signature.toHex(); 
-		const isValid = UtilCrypto.signatureVerify(encoded_offer,signature, maker);
+		const maker = signedOffer.signer;
+		const offer = signedOffer.offer;
+		const encoded_offer = offer.toU8a();
+		const signature = signedOffer.signature.toHex();
+		const isValid = UtilCrypto.signatureVerify(encoded_offer, signature, maker);
 		// if its correctly signed!
-		if (isValid.isValid) {			
+		if (isValid.isValid) {
 			//verify user nonce 
 			const nonce = await parrot.getNonce(maker);
-			if (nonce.toNumber() === offer.nonce.toNumber()){
+			if (nonce.toNumber() === offer.nonce.toNumber()) {
 				// get offer token balance
 				const offerer_token_balance = await parrot.getTokenBalance(maker, offer.offer_token);
 				// ensure user has enough tokens 
-				if (offerer_token_balance > offer.offer_amount){
+				if (offerer_token_balance > offer.offer_amount) {
 					// TODO : verify quantity and price and side
 					console.log('create quantity: ', req.body.quantity);
 					const order = {
@@ -73,10 +73,10 @@ exports.create = async(req, res) => {
 						orderType: req.body.orderType,
 						makerSide: req.body.makerSide,
 						signedOffer: req.body.signedOffer,
-						address: req.body.signedOffer.signer, 
+						address: req.body.signedOffer.signer,
 						status: "OPEN",
 						createTime: Date.now() / 1000
-					};		
+					};
 					Order.create(order)
 						.then(data => {
 							res.send(data);
@@ -88,20 +88,20 @@ exports.create = async(req, res) => {
 						});
 
 				}
-				else{
-					res.status(500).send({message: `Not Enough Balance! Current Token Balance: ${offerer_token_balance} Order Amount: ${offer.offer_amount}`})
+				else {
+					res.status(500).send({ message: `Not Enough Balance! Current Token Balance: ${offerer_token_balance} Order Amount: ${offer.offer_amount}` })
 				}
 			}
-			else{
-				res.status(500).send({message: `Invalid Nonce! Current Nonce: ${nonce} Order Nonce: ${signedOffer.offer.nonce}`})
+			else {
+				res.status(500).send({ message: `Invalid Nonce! Current Nonce: ${nonce} Order Nonce: ${signedOffer.offer.nonce}` })
 			}
 		}
 		else {
-			res.status(500).send({message: "Invalid Signature!"})
+			res.status(500).send({ message: "Invalid Signature!" })
 		}
 	}
-	catch(err){
-		res.status(500).send({message: err.message || "Invalid Order!"}) 
+	catch (err) {
+		res.status(500).send({ message: err.message || "Invalid Order!" })
 	}
 };
 
@@ -194,7 +194,7 @@ exports.myOrders = (req, res) => {
 
 	Order.findAll({
 		attributes: ['symbol', 'quantity', 'price', 'makerSide', 'orderType', 'orderId', 'status', 'address', 'signedOffer'],
-		where: { status: "OPEN", address : address }
+		where: { status: "OPEN", address: address }
 	})
 		.then(data => {
 			// TODO we need to manipulate the data here before sending back
@@ -213,8 +213,8 @@ exports.getOrderBook = (req, res) => {
 	// we need to build our JSON object manually
 	var finalJSON = { "symbol": symbol };
 	Order.findAll({
-		attributes: ['orderId', 'price', 'quantity', 'signedOffer'],
-		where: { symbol: symbol, makerSide: "BUY" , status: "OPEN"},
+		attributes: ['orderId', 'price', 'quantity', 'signedOffer', 'address'],
+		where: { symbol: symbol, makerSide: "BUY", status: "OPEN" },
 		order: [["price", "DESC"]]
 	})
 		.then(data => {
@@ -222,7 +222,7 @@ exports.getOrderBook = (req, res) => {
 		})
 		.then(() => {
 			Order.findAll({
-				attributes: ['orderId', 'price', 'quantity', 'makerSig'],
+				attributes: ['orderId', 'price', 'quantity', 'signedOffer', 'address'],
 				where: { symbol: symbol, makerSide: "SELL" },
 				order: [["price", "ASC"]]
 			})
@@ -243,48 +243,48 @@ exports.getOrderBook = (req, res) => {
 
 
 // Delete an order with orderId
-exports.delete = async(req, res) => {
+exports.delete = async (req, res) => {
 
 	try {
 		// get order id from url 
 		const orderId = req.params.orderId;
 		console.log('delete: ', orderId);
 		// get signature and address from req body 
-		const address = req.body.address; 
-		const signature = req.body.signature; 
+		const address = req.body.address;
+		const signature = req.body.signature;
 		// check if signature is valid 
 		valid = checkCancelSignature(orderId, signature, address);
-		if (valid){
+		if (valid) {
 
-			
-			Order.update({status: 'CANCELED'}, {
-				where: {orderId: orderId, address: address} 
-			})
-			.then(num => {
-				if (num == 1) {
-					//TODO this should return the order details
-					res.send({
-						message: `Order ${orderId} cancelled successfully.`
-					});
-				} else {
-					res.status(500).send({
-						message: `Cannot cancel order ${orderId}. Maybe order not found or req.body was empty!`
-					});
-				}
-			})
-			.catch(err => {
-				res.status(500).send({ message: "Error cancelling order with id = " + orderId });
-			});
 
-			
-		
+			Order.update({ status: 'CANCELED' }, {
+				where: { orderId: orderId, address: address }
+			})
+				.then(num => {
+					if (num == 1) {
+						//TODO this should return the order details
+						res.send({
+							message: `Order ${orderId} cancelled successfully.`
+						});
+					} else {
+						res.status(500).send({
+							message: `Cannot cancel order ${orderId}. Maybe order not found or req.body was empty!`
+						});
+					}
+				})
+				.catch(err => {
+					res.status(500).send({ message: "Error cancelling order with id = " + orderId });
+				});
+
+
+
 		}
-		else{
-			res.status(500).send({ message: "Invalid Cancel Signature!"});
+		else {
+			res.status(500).send({ message: "Invalid Cancel Signature!" });
 		}
-	}	
-	catch(err){
-		res.status(500).send({ message: err.message || "Invalid Cancel Signature!"});
+	}
+	catch (err) {
+		res.status(500).send({ message: err.message || "Invalid Cancel Signature!" });
 	}
 }
 
