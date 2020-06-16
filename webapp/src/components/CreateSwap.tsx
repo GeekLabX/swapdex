@@ -69,6 +69,8 @@ const CreateSwap: React.FC<CreateSwapProps> = ({ history }) => {
 			type: Types.SYMBOL_CHANGE,
 			payload: {
 				symbol: s.target.value,
+				bids: state.bids,
+				asks: state.asks,
 			},
 		});
 	};
