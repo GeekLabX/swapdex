@@ -54,7 +54,7 @@ export interface ICreateOrder {
 
 type IStateContext = {
 	orderId: number;
-	symbol: String;
+	symbol: string;
 	bids: ITableData[];
 	asks: ITableData[];
 };
@@ -103,10 +103,10 @@ export const appReducer = (state: IStateContext, action: Action) => {
 				...state,
 				symbol: action.payload.symbol,
 				bids: [
-					{ key: 0, price: '0.0', amount: '0.0', total: '0.0', address: '' },
+					{ key: 0, price: '0.0', quantity: '0.0', total: '0.0', address: '' },
 				],
 				asks: [
-					{ key: 0, price: '0.0', amount: '0.0', total: '0.0', address: '' },
+					{ key: 0, price: '0.0', quantity: '0.0', total: '0.0', address: '' },
 				],
 			};
 		case Types.SELECT_ORDER:
