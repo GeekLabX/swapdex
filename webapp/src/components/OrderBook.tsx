@@ -133,7 +133,7 @@ const OrderBook: React.FC<Props> = ({ allOrders }) => {
 	const topColumns: ColumnsType<ITableData> = [
 		{
 			dataIndex: 'amount',
-			key: 'amount',
+			key: 'quantity',
 			align: 'right',
 		},
 		{
@@ -151,7 +151,7 @@ const OrderBook: React.FC<Props> = ({ allOrders }) => {
 	const bottomColumns: ColumnsType<ITableData> = [
 		{
 			dataIndex: 'amount',
-			key: 'amount',
+			key: 'quantity',
 			align: 'right',
 		},
 		{
