@@ -32,7 +32,7 @@ Currently supported functions:
 
 Example: A BUY side order for OAXETH means they are buying OAX in exchange for ETH
 
-#### Create Order Request
+#### Example Create Order Request
 
 `POST /api/v1/order`
 
@@ -97,7 +97,7 @@ This is the message returned from the above HTTP POST request
 | ------- | :-----: | :-------: | :---------: |
 | orderId | INTEGER |    YES    |             |
 
-#### Query Order Request
+#### Example Query Order Request
 
 `GET /api/v1/order/1`
 
@@ -152,7 +152,7 @@ function cancelOrder(oid, keyringPair) {
 | orderId       |   INTEGER   |    YES    | Order ID returned in ACK Response of [Create Order](#create-order) |
 | signedMessage | JSON-STRING |    NO     |                Signed proof that this is our order                 |
 
-#### Cancel Order Request
+#### Example Cancel Order Request
 
 `/api/v1/delete/2`
 
@@ -187,7 +187,7 @@ function cancelOrder(oid, keyringPair) {
 | symbol | STRING |    YES    |      CCY1/CCY2      |
 | limit  |  INT   |    NO     | TODO not needed yet |
 
-#### Order Book Request
+#### Example Order Book Request
 
 ```
 /api/v1/depth/ETH%2fUSDT
@@ -203,13 +203,24 @@ function cancelOrder(oid, keyringPair) {
             "orderId": 2,
             "price": "330",
             "quantity": "300",
-            "signedOffer": {..}
+            "signedOffer": {
+                "offer": {
+                    "offer_token": 1,
+                    "offer_amount": 100,
+                    "requested_token": 0,
+                    "requested_amount": 200,
+                    "nonce": 1
+                },
+                "signer": "0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48",
+                "signature": "0x0162a802f327a003d5f8cd175009b3e0f24edc5120eba064b08513daa4ccdd470e607e8a5fe1bd84a3751f4514b50cc802dd2c85944e6d99a36d266af304a5428b"
+            }
         },
         {
             "orderId": 1,
             "price": "300",
             "quantity": "200",
-            "signedOffer": {..}
+            "signedOffer": {
+                "offer": {...}
         },
         {
             "orderId": 3,
@@ -223,19 +234,30 @@ function cancelOrder(oid, keyringPair) {
             "orderId": 5,
             "price": "900",
             "quantity": "275",
-            "signedOffer": {..}
+            "signedOffer": {
+                "offer": {
+                    "offer_token": 1,
+                    "offer_amount": 100,
+                    "requested_token": 0,
+                    "requested_amount": 200,
+                    "nonce": 1
+                },
+                "signer": "0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48",
+                "signature": "0x0162a802f327a003d5f8cd175009b3e0f24edc5120eba064b08513daa4ccdd470e607e8a5fe1bd84a3751f4514b50cc802dd2c85944e6d99a36d266af304a5428b"
+            }
         },
         {
             "orderId": 6,
             "price": "900",
             "quantity": "275",
-            "signedOffer": {..}
+            "signedOffer": {
+                "offer": {...}
         },
         {
             "orderId": 4,
             "price": "999",
             "quantity": "500",
-            "signedOffer": {..}
+            "signedOffer": {...}
         }
     ]
 }
@@ -245,11 +267,11 @@ function cancelOrder(oid, keyringPair) {
 
 `GET /api/v1/myOrders/:address`
 
-#### Get My Open Orders Request
+#### Example Get My Open Orders Request
 
 `GET /api/v1/myOrders/0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48`
 
-#### Create Order Response
+#### Get My Open Order Response
 
 This is the message returned from the above HTTP POST request
 

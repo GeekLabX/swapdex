@@ -7,30 +7,36 @@ export enum Types {
 }
 
 // IOrderBook interface is the format of the JSON returned from REST API for /api/v1/depth
-export interface IOrderBook {
+export interface IOrderBookResponse {
 	symbol: string;
-	asks: [IOrderBookEntry];
-	bids: [IOrderBookEntry];
+	asks: [IOrderBookOffer];
+	bids: [IOrderBookOffer];
 }
 
-// export const blankOrderBook: IOrderBook = {
-// 	symbol: 'OAX/ETH',
-// 	asks: [{ makerSig: '', orderId: 0, price: '', quantity: '' }],
-// 	bids: [{ makerSig: '', orderId: 0, price: '', quantity: '' }],
-// };
-
-export interface IOrderBookEntry {
-	makerSig: string;
+// is is part of the response in IOrderBookResponse
+export interface IOrderBookOffer {
 	orderId: number;
 	price: string;
 	quantity: string;
-	address: string;
+	signedOffer: {
+		offer: {
+			offer_token: number;
+			offer_amount: number;
+			requested_token: number;
+			requested_amount: number;
+			nonce: number;
+		};
+		signer: string;
+		signature: string;
+	};
 }
 
+//TODO need to replace address with signedOffer
+//TODO can we just get rid of this entirely and replace with IOrderBookOffer??
 export interface ITableData {
 	key: number;
 	price: string;
-	amount: string;
+	quantity: string;
 	total: string;
 	address: string;
 }
@@ -53,11 +59,12 @@ type IStateContext = {
 	asks: ITableData[];
 };
 
+//TODO need to replace address with signedOffer
 const initialState: IStateContext = {
 	orderId: 0,
 	symbol: 'OAX/ETH',
-	bids: [{ key: 0, price: '0.0', amount: '0.0', total: '0.0', address: '' }],
-	asks: [{ key: 0, price: '0.0', amount: '0.0', total: '0.0', address: '' }],
+	bids: [{ key: 0, price: '0.0', quantity: '0.0', total: '0.0', address: '' }],
+	asks: [{ key: 0, price: '0.0', quantity: '0.0', total: '0.0', address: '' }],
 };
 
 const AppContext = createContext<{
@@ -95,8 +102,12 @@ export const appReducer = (state: IStateContext, action: Action) => {
 			return {
 				...state,
 				symbol: action.payload.symbol,
-				bids: [{ key: 0, price: '0.0', amount: '0.0', total: '0.0' }],
-				asks: [{ key: 0, price: '0.0', amount: '0.0', total: '0.0' }],
+				bids: [
+					{ key: 0, price: '0.0', amount: '0.0', total: '0.0', address: '' },
+				],
+				asks: [
+					{ key: 0, price: '0.0', amount: '0.0', total: '0.0', address: '' },
+				],
 			};
 		case Types.SELECT_ORDER:
 			console.log('DISPATCH:: user selected orderId: ', action.payload.orderId);

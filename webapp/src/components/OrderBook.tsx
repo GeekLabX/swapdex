@@ -5,8 +5,8 @@ import fetch from 'node-fetch';
 import {
 	AppContext,
 	Types,
-	IOrderBookEntry,
-	IOrderBook,
+	IOrderBookOffer,
+	IOrderBookResponse,
 	ITableData,
 } from '../AppContext';
 import util from '../util';
@@ -49,7 +49,7 @@ const OrderBook: React.FC<Props> = ({ allOrders }) => {
 
 			try {
 				let data = await fetch(url, requestOptions);
-				let json = await data.json();
+				let json: IOrderBookResponse = await data.json();
 				//console.log('fetchData.json : ', state.symbol.toString(), json);
 
 				// extract/transform the raw response into a structure  we can use for UI
@@ -79,16 +79,16 @@ const OrderBook: React.FC<Props> = ({ allOrders }) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [state.symbol]); // useEffect dependency array, only re-render when state.symbol changes
 
-	const getAsks = (rawJson: IOrderBook) => {
+	const getAsks = (rawJson: IOrderBookResponse) => {
 		let rows: ITableData[] = [];
-		rawJson.asks.forEach((ask: IOrderBookEntry) => {
+		rawJson.asks.forEach((ask: IOrderBookOffer) => {
 			let p = parseFloat(ask.price);
 			let q = parseFloat(ask.quantity);
 			let t = p * q;
 			let a: ITableData = {
 				key: ask.orderId,
 				price: p.toFixed(8),
-				amount: q.toFixed(8),
+				quantity: q.toFixed(8),
 				total: t.toFixed(8),
 			};
 			rows.push(a);
@@ -97,16 +97,16 @@ const OrderBook: React.FC<Props> = ({ allOrders }) => {
 		return rows;
 	};
 
-	const getBids = (rawJson: IOrderBook) => {
+	const getBids = (rawJson: IOrderBookResponse) => {
 		let rows: ITableData[] = [];
-		rawJson.bids.forEach((bid: IOrderBookEntry) => {
+		rawJson.bids.forEach((bid: IOrderBookOffer) => {
 			let p = parseFloat(bid.price);
 			let q = parseFloat(bid.quantity);
 			let t = p * q;
 			let a: ITableData = {
 				key: bid.orderId,
 				price: p.toFixed(8),
-				amount: q.toFixed(8),
+				quantity: q.toFixed(8),
 				total: t.toFixed(8),
 			};
 			rows.push(a);
