@@ -83,6 +83,9 @@ class SwapInterface {
             return data;
         } catch (err) {
             console.log(`Error while sending getRequest to url ${url}! ${err}`);
+            if (err.response) {
+                console.log(err.response.data);
+            }
             return err;
         }
     }
@@ -90,13 +93,17 @@ class SwapInterface {
     async deleteRequest(query, body) {
         const url = this.buildUrl(query);
         console.log(url);
+        console.log(body);
         try {
-            const response = await axios.delete(url, body);
+            const response = await axios.delete(url, { data: body });
             const { data } = response;
             console.log(data);
             return data;
         } catch (err) {
             console.log(`Error while sending deleteRequest to url ${url}! ${err}`);
+            if (err.response) {
+                console.log(err.response.data);
+            }
             return err;
         }
     }
@@ -111,6 +118,9 @@ class SwapInterface {
             return data;
         } catch (err) {
             console.log(`Error while sending postRequest to url ${url}! ${err}`);
+            if (err.response) {
+                console.log(err.response.data);
+            }
             return err;
         }
     }
@@ -144,9 +154,10 @@ class SwapInterface {
         const signature = this.buildCancelSignature(oid, keyRingPair);
         const messageBody = {
             orderId: oid,
-            address: keyRingPair.address,
-            signature,
+            address: Util.u8aToHex(keyRingPair.publicKey),
+            signature: Util.u8aToHex(signature),
         };
+
         const query = `delete/${oid}`;
         const data = await this.deleteRequest(query, messageBody);
         return data;
@@ -168,7 +179,6 @@ class SwapInterface {
     async createOrder(pair, price, quantity, side, keyRingPair) {
         let offerToken; let offerAmount; let requestedToken; let requestedAmount;
         [offerToken, offerAmount, requestedToken, requestedAmount] = this.priceQuantityPairSideConvert(price, quantity, pair, side, keyRingPair);
-        console.log(offerToken, offerAmount, requestedToken, requestedAmount);
         //TODO: VERIFCATION THAT USER HAS ENOUGH TOKENS!!! 
         const signedOffer = await this.createSignedOffer(
             offerToken,
@@ -181,7 +191,7 @@ class SwapInterface {
             symbol: pair,
             quantity,
             price,
-            marketSide: side,
+            makerSide: side,
             orderType: 'LIMIT',
             address: keyRingPair.address,
             signedOffer: {
@@ -196,37 +206,9 @@ class SwapInterface {
                 }
             }
         };
-        console.log(body);
         const query = 'order';
         const orderDetails = await this.postRequest(query, body);
         return orderDetails;
     }
 }
-
-
-async function main() {
-    const parrotSwap = new SwapInterface();
-    await parrotSwap.initApi();
-    // const ob = await parrotSwap.getOrderBook('ETH/USDT');
-
-
-    // const order = await parrotSwap.createOrder('ETH/USDT', 200, 5, 'SELL', parrotSwap.parrot.keyRingPairs[1]);
-
-    // const orderStatus = await parrotSwap.getOrderById(1);
-    // const myOrder = await parrotSwap.getMyOpenOrders("0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48");
-
-
-
-
-
-
-    // const openOrders = await parrotSwap.getOpenOrders();
-    const status = await parrotSwap.cancelOrder(1, parrotSwap.parrot.keyRingPairs[1]);
-    process.exit(-1);
-}
-
-
-
-
-
-main().catch(console.error);
+module.exports = SwapInterface;

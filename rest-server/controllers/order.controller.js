@@ -44,9 +44,6 @@ exports.create = async (req, res) => {
 
     // Initialize parrot (Need this for verification of types + blockchain communication)
     const parrot = await parrotInit();
-    console.log('CreateOrder!');
-    console.log(req.body);
-    console.log(req.body.signedOffer.offer);
 
     // TODO: verify symbol (currently chain only uses TokenId)
     // no mapping between symbol and tokenId exists (Future update)
@@ -67,14 +64,14 @@ exports.create = async (req, res) => {
             //verify user nonce 
             const nonce = await parrot.getNonce(maker);
             if (nonce.toNumber() === offer.nonce.toNumber()) {
-                console.log("Nonce is valid!")
+                console.log("Nonce is valid!");
                 // get offer token balance
                 const offerer_token_balance = 1000000; //(HARDCODED)
                 //TODO UNCOMMENT BELOW LINE AND RE_ENABLE VERIFICATION
                 //const offerer_token_balance = await parrot.getTokenBalance(maker, offer.offer_token);
                 // ensure user has enough tokens 
                 if (offerer_token_balance > offer.offer_amount) {
-                    console.log("Balance check passed!")
+                    console.log("Balance check passed!");
                     // TODO : verify quantity and price and side
                     console.log('create quantity: ', req.body.quantity);
                     const order = {
@@ -264,6 +261,7 @@ exports.delete = async (req, res) => {
         // get order id from url 
         const orderId = req.params.orderId;
         console.log('delete: ', orderId);
+        console.log(req.body);
         // get signature and address from req body 
         const address = req.body.address;
         const signature = req.body.signature;
