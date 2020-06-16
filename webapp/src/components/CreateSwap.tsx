@@ -34,7 +34,7 @@ const CreateSwap: React.FC<CreateSwapProps> = ({ history }) => {
 		ccy2Quantity: 0,
 		price: 0,
 		side: 'BUY',
-		makerSig: '', //TODO Akshay
+		signedOffer: '', //TODO Akshay
 	});
 
 	const onChangeQuantity = (q: number | string | undefined) => {
@@ -92,7 +92,7 @@ const CreateSwap: React.FC<CreateSwapProps> = ({ history }) => {
 				price: values.price,
 				makerSide: values.side,
 				orderType: 'LIMIT',
-				makerSig: '',
+				signedOffer: '',
 			}),
 		};
 		const url = REST_URL + '/order';
