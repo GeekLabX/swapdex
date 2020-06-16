@@ -24,7 +24,8 @@ interface Props {
 const OrderBook: React.FC<Props> = ({ allOrders }) => {
 	const { state, dispatch } = useContext(AppContext);
 	let [ccy1, ccy2] = util.parseSymbol(state.symbol);
-	const [loading, setLoading] = useState(false); //TODO not used, we might want to disable things while being refreshed
+	//loading is used to display a spinner while we fetch data
+	const [loading, setLoading] = useState(false);
 	const [refreshTime, setRefreshTime] = useState('');
 	const requestOptions = {
 		method: 'GET',
@@ -42,15 +43,15 @@ const OrderBook: React.FC<Props> = ({ allOrders }) => {
 		// them within the scope of useEffect like this
 		async function fetchData() {
 			setLoading(true);
-			let t0 = performance.now();
+			// let t0 = performance.now();
 			let url =
 				REST_URL + '/depth/' + encodeURIComponent(state.symbol.toString());
-			let data = await fetch(url, requestOptions);
-			let json = await data.json();
-			console.log('fetchData.rawJson : ', state.symbol.toString(), json);
 
-			//TODO there is a bug where json comes back with bids undefined sometimes
-			if (json.bids) {
+			try {
+				let data = await fetch(url, requestOptions);
+				let json = await data.json();
+				//console.log('fetchData.json : ', state.symbol.toString(), json);
+
 				// extract/transform the raw response into a structure  we can use for UI
 				let askOrders = getAsks(json);
 				let bidOrders = getBids(json);
@@ -58,15 +59,17 @@ const OrderBook: React.FC<Props> = ({ allOrders }) => {
 				dispatch({
 					type: Types.CURRENT_ORDERBOOK,
 					payload: {
-						rawOrderBook: json,
+						symbol: state.symbol.toString(),
 						bids: bidOrders,
 						asks: askOrders,
 					},
 				});
-			} else console.log('ERROR fetchData had no bids');
-			setRefreshTime(new Date(Date.now()).toLocaleString());
-			let t1 = performance.now();
-			console.log('fetchData took ' + (t1 - t0) + ' ms');
+				setRefreshTime(new Date(Date.now()).toLocaleString());
+			} catch (err) {
+				console.log('fetch error: ', err);
+			}
+			// let t1 = performance.now();
+			// console.log('fetchData took ' + (t1 - t0) + ' ms');
 			setLoading(false);
 		}
 
@@ -77,7 +80,6 @@ const OrderBook: React.FC<Props> = ({ allOrders }) => {
 	}, [state.symbol]); // useEffect dependency array, only re-render when state.symbol changes
 
 	const getAsks = (rawJson: IOrderBook) => {
-		// console.log('getAsks.rawJson: ', rawJson);
 		let rows: ITableData[] = [];
 		rawJson.asks.forEach((ask: IOrderBookEntry) => {
 			let p = parseFloat(ask.price);
@@ -96,7 +98,6 @@ const OrderBook: React.FC<Props> = ({ allOrders }) => {
 	};
 
 	const getBids = (rawJson: IOrderBook) => {
-		//console.log('getBids.rawJson: ', rawJson);
 		let rows: ITableData[] = [];
 		rawJson.bids.forEach((bid: IOrderBookEntry) => {
 			let p = parseFloat(bid.price);
@@ -114,21 +115,33 @@ const OrderBook: React.FC<Props> = ({ allOrders }) => {
 		return rows;
 	};
 
-	const topColumns: ColumnsType<ITableData> = [
+	const headerCol: ColumnsType<ITableData> = [
 		{
 			title: `Amount (${ccy1})`,
+		},
+		{
+			title: `Price (${ccy2})`,
+		},
+		{
+			title: `Total (${ccy2})`,
+		},
+	];
+
+	//
+	//
+
+	const topColumns: ColumnsType<ITableData> = [
+		{
 			dataIndex: 'amount',
 			key: 'amount',
 			align: 'right',
 		},
 		{
-			title: `Price (${ccy2})`,
 			dataIndex: 'price',
 			key: 'price',
 			align: 'right',
 		},
 		{
-			title: `Total (${ccy2})`,
 			dataIndex: 'total',
 			key: 'total',
 			align: 'right',
