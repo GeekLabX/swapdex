@@ -11,6 +11,8 @@ const MarketSelector: React.FC = () => {
 			type: Types.SYMBOL_CHANGE,
 			payload: {
 				symbol: market.target.value,
+				bids: state.bids,
+				asks: state.asks,
 			},
 		});
 	};
