@@ -5,23 +5,41 @@ This project is split into 2 directories:
 2. webapp contains the React web application
 
 
-## Installation
-Each sub-directory is a self contained nodejs project so cd into each dir
-and dependencies
+
+
+
+## Rest Server 
+
+#### Pre-req 
+Mariadb
 ```shell
-npm install
+brew install mariadb 
+myqsl.server start
 ```
 
+(optionally run ```brew services start mariadb```)
 
-## Instructions
-Start the REST server
+#### Installation
+
 ```shell
 cd rest-server
+npm install 
+```
+
+#### Run
+```shell
+npm run start
+``` 
+
+## Webapp
+
+#### Installation
+```shell
+cd webapp
+```
+#### Run
+```shell
 npm run start
 ```
 
-Start the webapp
-```shell
-cd webapp
-npm run start
-```
+
