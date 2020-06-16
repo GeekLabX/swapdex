@@ -38,7 +38,6 @@ export interface ITableData {
 	price: string;
 	quantity: string;
 	total: string;
-	address: string;
 }
 
 export interface ICreateOrder {
@@ -63,8 +62,8 @@ type IStateContext = {
 const initialState: IStateContext = {
 	orderId: 0,
 	symbol: 'OAX/ETH',
-	bids: [{ key: 0, price: '0.0', quantity: '0.0', total: '0.0', address: '' }],
-	asks: [{ key: 0, price: '0.0', quantity: '0.0', total: '0.0', address: '' }],
+	bids: [{ key: 0, price: '0.0', quantity: '0.0', total: '0.0' }],
+	asks: [{ key: 0, price: '0.0', quantity: '0.0', total: '0.0' }],
 };
 
 const AppContext = createContext<{
