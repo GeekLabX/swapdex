@@ -101,12 +101,8 @@ export const appReducer = (state: IStateContext, action: Action) => {
 			return {
 				...state,
 				symbol: action.payload.symbol,
-				bids: [
-					{ key: 0, price: '0.0', quantity: '0.0', total: '0.0', address: '' },
-				],
-				asks: [
-					{ key: 0, price: '0.0', quantity: '0.0', total: '0.0', address: '' },
-				],
+				bids: [{ key: 0, price: '0.0', quantity: '0.0', total: '0.0' }],
+				asks: [{ key: 0, price: '0.0', quantity: '0.0', total: '0.0' }],
 			};
 		case Types.SELECT_ORDER:
 			console.log('DISPATCH:: user selected orderId: ', action.payload.orderId);
