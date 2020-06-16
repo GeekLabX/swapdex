@@ -1,8 +1,6 @@
 // ATOMIC SWAP DEMO for PRC20 TOKENS
 // this is a custom polkadot js api wrapper
 const ParrotInterface = require('parrot-client');
-const Util = require('@polkadot/util');
-const UtilCrypto = require('@polkadot/util-crypto');
 const axios = require('axios');
 
 const ExchangeSettings = {
@@ -37,15 +35,15 @@ class SwapInterface {
 
     buildCancelSignature(oid, keyringPair) {
         const cancelMessage = { "cancel": oid }.toString();
-        const encodedMessage = Util.stringToU8a(cancelMessage);
+        const encodedMessage = this.parrot.util.stringToU8a(cancelMessage);
         const signature = keyringPair.sign(encodedMessage);
         return signature;
     }
 
     validateCancelSignature(oid, signature, address) {
         const cancelMessage = { cancel: oid }.toString();
-        const encodedMessage = Util.stringToU8a(cancelMessage);
-        const isValid = UtilCrypto.signatureVerify(encodedMessage, signature, address);
+        const encodedMessage = this.parrot.util.stringToU8a(cancelMessage);
+        const isValid = this.parrot.utilCrypto.signatureVerify(encodedMessage, signature, address);
         return isValid.isValid;
     }
 
@@ -154,8 +152,8 @@ class SwapInterface {
         const signature = this.buildCancelSignature(oid, keyRingPair);
         const messageBody = {
             orderId: oid,
-            address: Util.u8aToHex(keyRingPair.publicKey),
-            signature: Util.u8aToHex(signature),
+            address: this.parrot.util.u8aToHex(keyRingPair.publicKey),
+            signature: this.parrot.util.u8aToHex(signature),
         };
 
         const query = `delete/${oid}`;
