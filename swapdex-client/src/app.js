@@ -74,7 +74,7 @@ async function main() {
 
 
     // const openOrders = await parrotSwap.getOpenOrders();
-    const status = await parrotSwap.cancelOrder(2, parrotSwap.parrot.keyRingPairs[1]);
+    const status = await parrotSwap.cancelOrder(6, parrotSwap.parrot.keyRingPairs[1]);
     process.exit(-1);
 }
 

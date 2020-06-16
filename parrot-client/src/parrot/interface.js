@@ -1,12 +1,15 @@
 const { ApiPromise, Keyring, WsProvider } = require('@polkadot/api');
 const { BN } = require('bn.js');
 const Util = require('@polkadot/util');
+const UtilCrypto = require('@polkadot/util-crypto');
 const ADDITIONAL_TYPES = require('../types/types.json');
 
 class ParrotInterface {
     constructor(types = ADDITIONAL_TYPES) {
         this.types = types;
         this.api = undefined;
+        this.util = Util;
+        this.utilCrypto = UtilCrypto;
         this.providerUrl = 'ws://localhost:9944';
         this.keyRingPairs = [];
         this.DOLLARS = new BN('1000000000000');
