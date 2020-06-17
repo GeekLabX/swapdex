@@ -32,15 +32,6 @@ export interface IOrderBookOffer {
 	};
 }
 
-//TODO need to replace address with signedOffer
-//TODO can we just get rid of this entirely and replace with IOrderBookOffer??
-// export interface ITableData {
-// 	key: number;
-// 	price: string;
-// 	quantity: string;
-// 	total: string;
-// }
-
 export interface ICreateOrder {
 	market: string;
 	price: number;
@@ -59,7 +50,6 @@ type IStateContext = {
 	asks: IOrderBookOffer[];
 };
 
-//TODO need to replace address with signedOffer
 const initialState: IStateContext = {
 	orderId: 0,
 	symbol: 'OAX/ETH',
