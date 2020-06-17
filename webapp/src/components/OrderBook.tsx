@@ -7,7 +7,6 @@ import {
 	Types,
 	IOrderBookOffer,
 	IOrderBookResponse,
-	ITableData,
 } from '../AppContext';
 import util from '../util';
 import { REST_URL } from '../constants';
@@ -52,16 +51,12 @@ const OrderBook: React.FC<Props> = ({ allOrders }) => {
 				let json: IOrderBookResponse = await data.json();
 				//console.log('fetchData.json : ', state.symbol.toString(), json);
 
-				// extract/transform the raw response into a structure  we can use for UI
-				let askOrders = getAsks(json);
-				let bidOrders = getBids(json);
-
 				dispatch({
 					type: Types.CURRENT_ORDERBOOK,
 					payload: {
 						symbol: state.symbol.toString(),
-						bids: bidOrders,
-						asks: askOrders,
+						bids: json.bids,
+						asks: json.asks,
 					},
 				});
 				setRefreshTime(new Date(Date.now()).toLocaleString());
@@ -79,99 +74,54 @@ const OrderBook: React.FC<Props> = ({ allOrders }) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [state.symbol]); // useEffect dependency array, only re-render when state.symbol changes
 
-	const getAsks = (rawJson: IOrderBookResponse) => {
-		let rows: ITableData[] = [];
-		rawJson.asks.forEach((ask: IOrderBookOffer) => {
-			let p = parseFloat(ask.price);
-			let q = parseFloat(ask.quantity);
-			let t = p * q;
-			let a: ITableData = {
-				key: ask.orderId,
-				price: p.toFixed(8),
-				quantity: q.toFixed(8),
-				total: t.toFixed(8),
-			};
-			rows.push(a);
-		});
-
-		return rows;
-	};
-
-	const getBids = (rawJson: IOrderBookResponse) => {
-		let rows: ITableData[] = [];
-		rawJson.bids.forEach((bid: IOrderBookOffer) => {
-			let p = parseFloat(bid.price);
-			let q = parseFloat(bid.quantity);
-			let t = p * q;
-			let a: ITableData = {
-				key: bid.orderId,
-				price: p.toFixed(8),
-				quantity: q.toFixed(8),
-				total: t.toFixed(8),
-			};
-			rows.push(a);
-		});
-
-		return rows;
-	};
-
-	const headerCol: ColumnsType<ITableData> = [
+	const topColumns: ColumnsType<IOrderBookOffer> = [
 		{
-			title: `Amount (${ccy1})`,
+			title: `Quantity (${ccy1})`,
+			dataIndex: 'quantity',
+			key: 'quantity',
+			align: 'right',
 		},
 		{
 			title: `Price (${ccy2})`,
+			dataIndex: 'price',
+			key: 'price',
+			align: 'right',
 		},
 		{
 			title: `Total (${ccy2})`,
-		},
-	];
-
-	//
-	//
-
-	const topColumns: ColumnsType<ITableData> = [
-		{
-			dataIndex: 'amount',
-			key: 'quantity',
-			align: 'right',
-		},
-		{
-			dataIndex: 'price',
-			key: 'price',
-			align: 'right',
-		},
-		{
 			dataIndex: 'total',
 			key: 'total',
 			align: 'right',
 		},
 	];
 
-	const bottomColumns: ColumnsType<ITableData> = [
+	const bottomColumns: ColumnsType<IOrderBookOffer> = [
 		{
-			dataIndex: 'amount',
+			title: `Quantity (${ccy1})`,
+			dataIndex: 'quantity',
 			key: 'quantity',
 			align: 'right',
 		},
 		{
+			title: `Price (${ccy2})`,
 			dataIndex: 'price',
 			key: 'price',
 			align: 'right',
 		},
 		{
+			title: `Total (${ccy2})`,
 			dataIndex: 'total',
 			key: 'total',
 			align: 'right',
 		},
 	];
 
-	const onRowClick = (r: ITableData) => {
-		console.log('onRowClick orderId: ', r.key);
+	const onRowClick = (r: IOrderBookOffer) => {
+		console.log('onRowClick orderId: ', r.orderId);
 		dispatch({
 			type: Types.SELECT_ORDER,
 			payload: {
-				orderId: r.key,
+				orderId: r.orderId,
 			},
 		});
 	};
@@ -185,16 +135,6 @@ const OrderBook: React.FC<Props> = ({ allOrders }) => {
 			<Content style={{ minHeight: '70vh' }}>
 				<Spin spinning={loading}>
 					<Table
-						columns={topColumns}
-						dataSource={state.bids}
-						pagination={{ hideOnSinglePage: true }}
-						size='small'
-						onRow={(r) => ({
-							onClick: () => onRowClick(r),
-						})}
-						id='oax-orderbook-bids'
-					/>
-					<Table
 						columns={bottomColumns}
 						dataSource={state.asks}
 						pagination={{ hideOnSinglePage: true }}
@@ -203,6 +143,16 @@ const OrderBook: React.FC<Props> = ({ allOrders }) => {
 							onClick: () => onRowClick(r),
 						})}
 						id='oax-orderbook-asks'
+					/>
+					<Table
+						columns={topColumns}
+						dataSource={state.bids}
+						pagination={{ hideOnSinglePage: true }}
+						size='small'
+						onRow={(r) => ({
+							onClick: () => onRowClick(r),
+						})}
+						id='oax-orderbook-bids'
 					/>
 				</Spin>
 			</Content>

@@ -37,10 +37,10 @@
 	}
 }
 
-#oax-orderbook-bids {
+#oax-orderbook-asks {
 	color: #d4380d;
 }
 
-#oax-orderbook-asks {
+#oax-orderbook-bids {
 	color: #52c41a;
 }

@@ -18,6 +18,7 @@ export interface IOrderBookOffer {
 	orderId: number;
 	price: string;
 	quantity: string;
+	total: string;
 	signedOffer: {
 		offer: {
 			offer_token: number;
@@ -33,12 +34,12 @@ export interface IOrderBookOffer {
 
 //TODO need to replace address with signedOffer
 //TODO can we just get rid of this entirely and replace with IOrderBookOffer??
-export interface ITableData {
-	key: number;
-	price: string;
-	quantity: string;
-	total: string;
-}
+// export interface ITableData {
+// 	key: number;
+// 	price: string;
+// 	quantity: string;
+// 	total: string;
+// }
 
 export interface ICreateOrder {
 	market: string;
@@ -54,16 +55,52 @@ export interface ICreateOrder {
 type IStateContext = {
 	orderId: number;
 	symbol: string;
-	bids: ITableData[];
-	asks: ITableData[];
+	bids: IOrderBookOffer[];
+	asks: IOrderBookOffer[];
 };
 
 //TODO need to replace address with signedOffer
 const initialState: IStateContext = {
 	orderId: 0,
 	symbol: 'OAX/ETH',
-	bids: [{ key: 0, price: '0.0', quantity: '0.0', total: '0.0' }],
-	asks: [{ key: 0, price: '0.0', quantity: '0.0', total: '0.0' }],
+	bids: [
+		{
+			orderId: 0,
+			price: '0.0',
+			quantity: '0.0',
+			total: '0.0',
+			signedOffer: {
+				offer: {
+					offer_token: 1,
+					offer_amount: 0,
+					requested_token: 0,
+					requested_amount: 0,
+					nonce: 0,
+				},
+				signer: '',
+				signature: '',
+			},
+		},
+	],
+	asks: [
+		{
+			orderId: 0,
+			price: '0.0',
+			quantity: '0.0',
+			total: '0.0',
+			signedOffer: {
+				offer: {
+					offer_token: 1,
+					offer_amount: 0,
+					requested_token: 0,
+					requested_amount: 0,
+					nonce: 0,
+				},
+				signer: '',
+				signature: '',
+			},
+		},
+	],
 };
 
 const AppContext = createContext<{
@@ -79,16 +116,16 @@ export type Action =
 			type: Types.SYMBOL_CHANGE;
 			payload: {
 				symbol: string;
-				bids: ITableData[];
-				asks: ITableData[];
+				bids: IOrderBookOffer[];
+				asks: IOrderBookOffer[];
 			};
 	  }
 	| {
 			type: Types.CURRENT_ORDERBOOK;
 			payload: {
 				symbol: string;
-				bids: ITableData[];
-				asks: ITableData[];
+				bids: IOrderBookOffer[];
+				asks: IOrderBookOffer[];
 			};
 	  }
 	| { type: Types.SELECT_ORDER; payload: { orderId: number } };
@@ -101,8 +138,42 @@ export const appReducer = (state: IStateContext, action: Action) => {
 			return {
 				...state,
 				symbol: action.payload.symbol,
-				bids: [{ key: 0, price: '0.0', quantity: '0.0', total: '0.0' }],
-				asks: [{ key: 0, price: '0.0', quantity: '0.0', total: '0.0' }],
+				bids: [
+					{
+						orderId: 0,
+						price: '0.0',
+						quantity: '0.0',
+						signedOffer: {
+							offer: {
+								offer_token: 1,
+								offer_amount: 0,
+								requested_token: 0,
+								requested_amount: 0,
+								nonce: 0,
+							},
+							signer: '',
+							signature: '',
+						},
+					},
+				],
+				asks: [
+					{
+						orderId: 0,
+						price: '0.0',
+						quantity: '0.0',
+						signedOffer: {
+							offer: {
+								offer_token: 1,
+								offer_amount: 0,
+								requested_token: 0,
+								requested_amount: 0,
+								nonce: 0,
+							},
+							signer: '',
+							signature: '',
+						},
+					},
+				],
 			};
 		case Types.SELECT_ORDER:
 			console.log('DISPATCH:: user selected orderId: ', action.payload.orderId);

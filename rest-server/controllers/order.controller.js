@@ -225,7 +225,7 @@ exports.getOrderBook = (req, res) => {
     // we need to build our JSON object manually
     var finalJSON = { "symbol": symbol };
     Order.findAll({
-        attributes: ['orderId', 'price', 'quantity', 'signedOffer'],
+        attributes: ['orderId', 'price', 'quantity', 'total', 'signedOffer'],
         where: { symbol: symbol, makerSide: "BUY", status: "OPEN" },
         order: [["price", "DESC"]]
     })
@@ -234,7 +234,7 @@ exports.getOrderBook = (req, res) => {
         })
         .then(() => {
             Order.findAll({
-                attributes: ['orderId', 'price', 'quantity', 'signedOffer'],
+                attributes: ['orderId', 'price', 'quantity', 'total', 'signedOffer'],
                 where: { symbol: symbol, makerSide: "SELL", status: "OPEN" },
                 order: [["price", "ASC"]]
             })

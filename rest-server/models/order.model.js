@@ -42,10 +42,6 @@ module.exports = (sequelize, Sequelize) => {
 			type: Sequelize.STRING,
 			allowNull: false,
 		},
-		// takerSide: {
-		// 	type: Sequelize.STRING,
-		// 	allowNull: true,
-		// },
 		quantity: {
 			type: Sequelize.DECIMAL(36, 8),
 			allowNull: false,
@@ -58,14 +54,15 @@ module.exports = (sequelize, Sequelize) => {
 			type: Sequelize.DECIMAL(36, 8),
 			allowNull: false,
 		},
-		// makerClientId: {
-		// 	type: Sequelize.STRING,
-		// 	allowNull: false,
-		// },
-		// takerClientId: {
-		// 	type: Sequelize.STRING,
-		// 	allowNull: true,
-		// },
+		total: {
+			type: Sequelize.VIRTUAL,
+			get() {
+				return this.quantity * this.price;
+			},
+			set(value) {
+				throw new Error('Do not try to set this virtual column, total');
+			}
+		},
 		status: {
 			type: Sequelize.STRING,
 			allowNull: false,
@@ -81,10 +78,6 @@ module.exports = (sequelize, Sequelize) => {
 			type: Sequelize.JSON,
 			allowNull: false,
 		},
-		// takerSig: {
-		// 	type: Sequelize.JSON,
-		// 	allowNull: true
-		// }
 	});
 
 	return Order;
