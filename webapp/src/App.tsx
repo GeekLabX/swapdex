@@ -2,13 +2,7 @@ import React, { useEffect } from 'react';
 import { BrowserRouter, Switch, Route, Link } from 'react-router-dom';
 import { Typography, Layout, Row, Col, Menu, Divider } from 'antd';
 import { FormOutlined, OrderedListOutlined } from '@ant-design/icons';
-import {
-	web3Accounts,
-	web3Enable,
-	web3FromAddress,
-	web3ListRpcProviders,
-	web3UseRpcProvider,
-} from '@polkadot/extension-dapp';
+import { ApiPromise, WsProvider } from '@polkadot/api';
 
 import 'antd/dist/antd.css';
 import OrdersPage from './OrdersPage';
@@ -21,10 +15,61 @@ const { Title } = Typography;
 
 const App = () => {
 	const injectPolkadot = async () => {
-		const allInjected = await web3Enable('OAX swap DEX');
-		console.log('all injected: ', allInjected);
-		const allAccounts = await web3Accounts();
-		console.log('web3 accounts: ', allAccounts);
+		const ws = new WsProvider('ws://localhost:9944');
+		// Instantiate the API
+		const api = await ApiPromise.create({
+			types: {
+				Address: 'AccountId',
+				TokenBalance: 'u128',
+				TokenId: 'u128',
+				Public: 'AccountId',
+				Signature: 'MultiSignature',
+				Offer: {
+					offer_token: 'TokenId',
+					offer_amount: 'TokenBalance',
+					requested_token: 'TokenId',
+					requested_amount: 'TokenBalance',
+					nonce: 'u128',
+				},
+				SignedOffer: {
+					offer: 'Offer',
+					signature: 'MultiSignature',
+					signer: 'AccountId',
+				},
+				TransferDetails: {
+					amount: 'Balance',
+					to: 'AccountId',
+				},
+				TokenTransferDetails: {
+					amount: 'TokenBalance',
+					to: 'AccountId',
+				},
+				TransferStatus: {
+					amount: 'TokenBalance',
+					to: 'AccountId',
+					status: 'bool',
+				},
+				DelegatedTransferDetails: {
+					amount: 'Balance',
+					to: 'AccountId',
+					nonce: 'u128',
+				},
+				SignedDelegatedTransferDetails: {
+					transfer: 'DelegatedTransferDetails',
+					signature: 'MultiSignature',
+					signer: 'AccountId',
+				},
+			},
+			provider: ws,
+		});
+		const [chain, nodeName, nodeVersion] = await Promise.all([
+			api.rpc.system.chain(),
+			api.rpc.system.name(),
+			api.rpc.system.version(),
+		]);
+		console.log(
+			`You are connected to chain ${chain} using ${nodeName} v${nodeVersion}`
+		);
 	};
 
 	useEffect(() => {
