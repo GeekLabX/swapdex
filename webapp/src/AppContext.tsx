@@ -133,6 +133,7 @@ export const appReducer = (state: IStateContext, action: Action) => {
 						orderId: 0,
 						price: '0.0',
 						quantity: '0.0',
+						total: '0.0',
 						signedOffer: {
 							offer: {
 								offer_token: 1,
@@ -151,6 +152,7 @@ export const appReducer = (state: IStateContext, action: Action) => {
 						orderId: 0,
 						price: '0.0',
 						quantity: '0.0',
+						total: '0.0',
 						signedOffer: {
 							offer: {
 								offer_token: 1,
