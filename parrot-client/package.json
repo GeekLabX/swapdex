@@ -4,7 +4,10 @@
     "description": "OAX Parrot Parachain Client",
     "main": "src/parrot/interface.js",
     "scripts": {
-        "test": ""
+        "build": "yarn generate:defs && yarn generate:meta",
+        "generate:defs": "ts-node --skip-project node_modules/.bin/polkadot-types-from-defs --package sample-polkadotjs-typegen/interfaces --input ./src/interfaces",
+        "generate:meta": "ts-node --skip-project node_modules/.bin/polkadot-types-from-chain --package sample-polkadotjs-typegen/interfaces --endpoint ./parrot.json --output ./src/interfaces",
+        "lint": "tsc --noEmit --pretty"
     },
     "author": "OAX Foundation",
     "license": "ISC",
@@ -19,6 +22,9 @@
         "@typescript-eslint/parser": "^3.3.0",
         "eslint": "^7.2.0",
         "eslint-config-airbnb-base": "^14.2.0",
-        "eslint-plugin-import": "^2.21.2"
+        "eslint-plugin-import": "^2.21.2",
+        "@polkadot/typegen": "^1.4.0",
+        "ts-node": "^8.6.2",
+        "typescript": "3.9.5"
     }
 }
